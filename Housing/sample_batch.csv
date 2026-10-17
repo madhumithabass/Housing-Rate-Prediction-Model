@@ -1,0 +1,6 @@
+CRIM,ZN,INDUS,CHAS,NOX,RM,AGE,DIS,RAD,TAX,PTRATIO,B,LSTAT,description
+0.02,18.0,2.5,0.0,0.45,6.5,65.0,4.5,1.0,300.0,15.0,390.0,5.0,Notebook Benchmark (Exact Verification)
+0.05,40.0,3.2,0.0,0.42,7.2,32.0,5.8,3.0,250.0,14.2,395.0,4.2,Suburban Executive Residence
+0.08,25.0,4.0,1.0,0.48,8.1,45.0,3.6,4.0,310.0,13.5,392.0,3.8,Charles River Waterfront Estate
+0.35,0.0,8.5,0.0,0.52,5.8,78.0,2.4,5.0,380.0,17.0,385.0,11.2,Urban Academic Flat
+2.8,0.0,18.1,0.0,0.65,5.1,92.0,1.8,24.0,666.0,20.2,360.0,21.5,Affordable Starter Home

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boston Housing Price Predictor</title>
+  
+  <!-- Clean Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for clean icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --success: #10b981;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    /* Header */
+    .navbar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      color: white;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .tag-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 999px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+
+    /* Main Container */
+    .main-wrapper {
+      max-width: 1200px;
+      margin: 28px auto 0;
+      padding: 0 20px;
+    }
+
+    /* Hero / Preset Bar */
+    .presets-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .preset-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preset-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-btn:hover {
+      background: var(--primary-light);
+      border-color: #93c5fd;
+      color: var(--primary);
+    }
+
+    /* App Grid (Inputs on Left, Result on Right) */
+    .app-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .app-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card Panels */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* Input Categories */
+    .category-group {
+      margin-bottom: 22px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .category-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .cat-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .inputs-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .input-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-label {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .field-code {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .field-desc {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f8fafc;
+      color: var(--text-main);
+      transition: all 0.15s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    select.form-control {
+      cursor: pointer;
+    }
+
+    /* Result Panel (Right Sticky) */
+    .result-panel {
+      position: sticky;
+      top: 96px;
+    }
+
+    .result-card {
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      border: 2px solid #93c5fd;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+
+    .result-header-text {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .badge-market {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1e40af;
+      margin-bottom: 16px;
+    }
+
+    .price-block {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 12px;
+      margin-bottom: 20px;
+    }
+
+    .price-main {
+      font-size: 2.7rem;
+      font-weight: 800;
+      color: #1d4ed8;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .price-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .price-today {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.95rem;
+      color: #0f172a;
+    }
+
+    .price-today strong {
+      color: var(--success);
+      font-size: 1.15rem;
+    }
+
+    /* Predict Button */
+    .btn-predict {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      transition: all 0.2s ease;
+      margin-bottom: 12px;
+    }
+
+    .btn-predict:hover {
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-predict:active {
+      transform: translateY(0);
+    }
+
+    .btn-reset {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      color: #64748b;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.15s ease;
+    }
+
+    .btn-reset:hover {
+      background: #f1f5f9;
+      color: var(--text-main);
+    }
+
+    .help-box {
+      margin-top: 18px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.78rem;
+      color: #475569;
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    .help-box i {
+      color: var(--primary);
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-house"></i>
+        </div>
+        <div>
+          <h1 class="brand-title">Boston Housing Price Predictor</h1>
+          <p class="brand-subtitle">Machine Learning Real-Estate Valuation Tool</p>
+        </div>
+      </div>
+      <div class="tag-live">
+        <span class="dot"></span> Model Ready
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-wrapper">
+
+    <!-- Quick Scenario Presets -->
+    <div class="presets-bar">
+      <div class="preset-label">
+        <i class="fa-solid fa-wand-magic-sparkles text-primary"></i>
+        <span>Sample Homes:</span>
+      </div>
+      <div class="preset-buttons">
+        <button type="button" class="preset-btn" onclick="loadPreset('default')">🏡 Standard Suburban Home</button>
+        <button type="button" class="preset-btn" onclick="loadPreset('luxury')">🌊 Luxury Waterfront Estate</button>
+        <button type="button" class="preset-btn" onclick="loadPreset('city')">🏙️ Urban City Apartment</button>
+        <button type="button" class="preset-btn" onclick="loadPreset('budget')">🔑 Affordable Starter Home</button>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="app-grid">
+      
+      <!-- Left Panel: The 13 Parameters Form -->
+      <section class="card">
+        <h2 class="section-title"><i class="fa-solid fa-sliders"></i> Property Parameters</h2>
+        <p class="section-desc">Adjust the details below or select a sample home above, then click Predict.</p>
+
+        <form id="housingForm" method="POST" action="/">
+          
+          <!-- Category 1: Home & Architecture -->
+          <div class="category-group">
+            <div class="cat-title"><i class="fa-solid fa-bed"></i> 1. Home & Building Details</div>
+            <div class="inputs-grid">
+              
+              <!-- RM -->
+              <div class="input-field">
+                <label class="field-label" for="RM">
+                  <span>Average Rooms</span>
+                  <span class="field-code">RM</span>
+                </label>
+                <span class="field-desc">Rooms per home (3.0 – 9.0)</span>
+                <input type="number" id="RM" name="RM" class="form-control" 
+                       value="{{ selected.get('RM', 6.5) }}" step="0.1" min="3.0" max="9.0" required>
+              </div>
+
+              <!-- AGE -->
+              <div class="input-field">
+                <label class="field-label" for="AGE">
+                  <span>Older Homes %</span>
+                  <span class="field-code">AGE</span>
+                </label>
+                <span class="field-desc">Built prior to 1940 (0 – 100%)</span>
+                <input type="number" id="AGE" name="AGE" class="form-control" 
+                       value="{{ selected.get('AGE', 65.0) }}" step="1" min="0" max="100" required>
+              </div>
+
+              <!-- ZN -->
+              <div class="input-field">
+                <label class="field-label" for="ZN">
+                  <span>Large Lot Zoning</span>
+                  <span class="field-code">ZN</span>
+                </label>
+                <span class="field-desc">Land for lots > 25,000 sq.ft (%)</span>
+                <input type="number" id="ZN" name="ZN" class="form-control" 
+                       value="{{ selected.get('ZN', 18.0) }}" step="1" min="0" max="100" required>
+              </div>
+
+              <!-- INDUS -->
+              <div class="input-field">
+                <label class="field-label" for="INDUS">
+                  <span>Business Area %</span>
+                  <span class="field-code">INDUS</span>
+                </label>
+                <span class="field-desc">Non-retail commercial land (%)</span>
+                <input type="number" id="INDUS" name="INDUS" class="form-control" 
+                       value="{{ selected.get('INDUS', 2.5) }}" step="0.1" min="0" max="30" required>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Category 2: Location & Neighborhood -->
+          <div class="category-group">
+            <div class="cat-title"><i class="fa-solid fa-location-dot"></i> 2. Location & Environment</div>
+            <div class="inputs-grid">
+              
+              <!-- CRIM -->
+              <div class="input-field">
+                <label class="field-label" for="CRIM">
+                  <span>Crime Rate</span>
+                  <span class="field-code">CRIM</span>
+                </label>
+                <span class="field-desc">Crime per capita (lower is safer)</span>
+                <input type="number" id="CRIM" name="CRIM" class="form-control" 
+                       value="{{ selected.get('CRIM', 0.02) }}" step="0.01" min="0" max="90" required>
+              </div>
+
+              <!-- DIS -->
+              <div class="input-field">
+                <label class="field-label" for="DIS">
+                  <span>Distance to Job Centers</span>
+                  <span class="field-code">DIS</span>
+                </label>
+                <span class="field-desc">Miles to Boston employment hubs</span>
+                <input type="number" id="DIS" name="DIS" class="form-control" 
+                       value="{{ selected.get('DIS', 4.5) }}" step="0.1" min="1.0" max="13.0" required>
+              </div>
+
+              <!-- NOX -->
+              <div class="input-field">
+                <label class="field-label" for="NOX">
+                  <span>Air Pollution Level</span>
+                  <span class="field-code">NOX</span>
+                </label>
+                <span class="field-desc">Nitric oxides (parts per 10M)</span>
+                <input type="number" id="NOX" name="NOX" class="form-control" 
+                       value="{{ selected.get('NOX', 0.45) }}" step="0.01" min="0.35" max="0.90" required>
+              </div>
+
+              <!-- RAD -->
+              <div class="input-field">
+                <label class="field-label" for="RAD">
+                  <span>Highway Accessibility</span>
+                  <span class="field-code">RAD</span>
+                </label>
+                <span class="field-desc">Access index to freeways (1 – 24)</span>
+                <input type="number" id="RAD" name="RAD" class="form-control" 
+                       value="{{ selected.get('RAD', 1.0) }}" step="1" min="1" max="24" required>
+              </div>
+
+              <!-- CHAS -->
+              <div class="input-field" style="grid-column: span 2;">
+                <label class="field-label" for="CHAS">
+                  <span>Charles River Waterfront</span>
+                  <span class="field-code">CHAS</span>
+                </label>
+                <span class="field-desc">Is this property adjacent to the Charles River?</span>
+                <select id="CHAS" name="CHAS" class="form-control">
+                  <option value="0" {% if selected.get('CHAS') == 0 %}selected{% endif %}>No (Inland Property)</option>
+                  <option value="1" {% if selected.get('CHAS') == 1 %}selected{% endif %}>Yes (Waterfront Property)</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Category 3: Community & Taxes -->
+          <div class="category-group">
+            <div class="cat-title"><i class="fa-solid fa-school"></i> 3. Community & Taxes</div>
+            <div class="inputs-grid">
+              
+              <!-- PTRATIO -->
+              <div class="input-field">
+                <label class="field-label" for="PTRATIO">
+                  <span>Pupil-Teacher Ratio</span>
+                  <span class="field-code">PTRATIO</span>
+                </label>
+                <span class="field-desc">Students per teacher in town</span>
+                <input type="number" id="PTRATIO" name="PTRATIO" class="form-control" 
+                       value="{{ selected.get('PTRATIO', 15.0) }}" step="0.1" min="12.0" max="23.0" required>
+              </div>
+
+              <!-- TAX -->
+              <div class="input-field">
+                <label class="field-label" for="TAX">
+                  <span>Property Tax Rate</span>
+                  <span class="field-code">TAX</span>
+                </label>
+                <span class="field-desc">Tax rate per $10,000 value</span>
+                <input type="number" id="TAX" name="TAX" class="form-control" 
+                       value="{{ selected.get('TAX', 300.0) }}" step="10" min="180" max="720" required>
+              </div>
+
+              <!-- LSTAT -->
+              <div class="input-field">
+                <label class="field-label" for="LSTAT">
+                  <span>Socioeconomic Index</span>
+                  <span class="field-code">LSTAT</span>
+                </label>
+                <span class="field-desc">% lower income population</span>
+                <input type="number" id="LSTAT" name="LSTAT" class="form-control" 
+                       value="{{ selected.get('LSTAT', 5.0) }}" step="0.1" min="1.0" max="40.0" required>
+              </div>
+
+              <!-- B -->
+              <div class="input-field">
+                <label class="field-label" for="B">
+                  <span>Demographic Index</span>
+                  <span class="field-code">B</span>
+                </label>
+                <span class="field-desc">Town demographic metric (0 – 400)</span>
+                <input type="number" id="B" name="B" class="form-control" 
+                       value="{{ selected.get('B', 390.0) }}" step="5" min="0" max="400" required>
+              </div>
+
+            </div>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- Right Panel: Valuation Result Card -->
+      <aside class="result-panel">
+        <div class="result-card">
+          <div class="result-header-text">Predicted Valuation</div>
+          <div class="badge-market" id="marketTag">{{ result.market_tag }}</div>
+
+          <div class="price-block">
+            <div class="price-main" id="priceDisplay">{{ result.price_formatted }}</div>
+            <div class="price-sub">Boston Dataset Benchmark (in $1,000s)</div>
+            
+            <div class="price-today">
+              <span>Today's Estimated Value:</span>
+              <strong id="adjustedPriceDisplay">{{ result.adjusted_formatted }}</strong>
+            </div>
+          </div>
+
+          <!-- The Single Big Predict Button -->
+          <button type="button" class="btn-predict" onclick="triggerPredict()">
+            <i class="fa-solid fa-calculator"></i> Predict House Value
+          </button>
+
+          <button type="button" class="btn-reset" onclick="loadPreset('default')">
+            <i class="fa-solid fa-rotate-left"></i> Reset to Default Values
+          </button>
+
+          <div class="help-box">
+            <i class="fa-solid fa-circle-info"></i>
+            This valuation is computed in real-time by a deep neural network trained on Boston property records, taking into account rooms, crime rates, local schools, and environmental quality.
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <script>
+    // Presets dictionary
+    const presets = {{ presets | tojson | safe }};
+
+    function loadPreset(presetKey) {
+      const p = presets[presetKey];
+      if (!p) return;
+      
+      for (const [key, val] of Object.entries(p.values)) {
+        const el = document.getElementById(key);
+        if (el) el.value = val;
+      }
+      
+      triggerPredict();
+    }
+
+    async function triggerPredict() {
+      const form = document.getElementById('housingForm');
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => { data[key] = parseFloat(value); });
+
+      try {
+        const response = await fetch('/predict-ajax', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          const res = await response.json();
+          if (res.success) {
+            document.getElementById('priceDisplay').textContent = res.result.price_formatted;
+            document.getElementById('adjustedPriceDisplay').textContent = res.result.adjusted_formatted;
+            document.getElementById('marketTag').textContent = res.result.market_tag;
+          }
+        }
+      } catch (err) {
+        console.log('Falling back to standard submit:', err);
+        form.submit();
+      }
+    }
+  </script>
+
+</body>
+</html>
